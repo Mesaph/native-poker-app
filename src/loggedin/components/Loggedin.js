@@ -7,18 +7,19 @@ import Waiting from './Waiting';
 
 class Loggedin extends Component {
     render() {
-        const {clientNames, voting, vote} = this.props;
+        const {clientNames, voting, vote, progress} = this.props;
 
         return (
             <View style={styles.container}>
                 <Text> { clientNames.length} Teilnehmer </Text>
-                { voting ? <Voting vote={vote} /> : <Waiting /> }
+                { voting ? <Voting vote={vote} /> : <Waiting progress={progress} /> }
             </View>
         );
     }
 }
 
 Loggedin.propTypes = {
+    progress: PropTypes.number.isRequired,
     clientNames: PropTypes.array.isRequired,
     voting: PropTypes.bool.isRequired,
     vote: PropTypes.func.isRequired,

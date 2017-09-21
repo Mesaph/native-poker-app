@@ -11,6 +11,7 @@ export const CONNECT_TO_SESSION = 'CONNECT_TO_SESSION';
 export const UPDATE_SESSION = 'UPDATE_SESSION';
 export const START = 'START';
 export const VOTE = 'VOTE';
+export const UPDATE_VOTE_PROGRESS = 'UPDATE_VOTE_PROGRESS';
 
 let ws;
 
@@ -28,6 +29,13 @@ export const getSessions = state => getStateBase(state).sessions;
 export const getClientNames = state => getStateBase(state).clientNames;
 export const isVoting = state => getStateBase(state).voting;
 export const getHost = state => getStateBase(state).host;
+export const getProgress = state => {
+    const voteTotal = getStateBase(state).voteTotal;
+    const voted = getStateBase(state).voted;
+
+    if (voteTotal === 0) return 0;
+    return voted/voteTotal;
+};
 
 export const setName = name => ({ type: PLANNING_POKER_SET_NAME, payload: name });
 export const setSessionId = sessionId => ({ type: PLANNING_POKER_SET_SESSION_ID, payload: sessionId });
@@ -73,6 +81,8 @@ const initialState = {
     clientNames: [],
     voting: false,
     host: '10.22.0.109:8080',
+    voted: 0,
+    voteTotal: 0,
 };
 
 export default (state = initialState, { type, payload }) => {
@@ -111,17 +121,24 @@ export default (state = initialState, { type, payload }) => {
                 sessionId: payload.id,
                 clientNames: payload.clientNames,
                 voting: false,
+                voteTotal: 0,
             };
         case START:
             return {
                 ...state,
                 selectedVote: null,
                 voting: true,
+                voteTotal: state.clientNames.length,
             };
         case VOTE:
             return {
                 ...state,
                 voting: false,
+            };
+        case UPDATE_VOTE_PROGRESS:
+            return {
+                ...state,
+                voted: payload,
             };
         default:
             return state;
