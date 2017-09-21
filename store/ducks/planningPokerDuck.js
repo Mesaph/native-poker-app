@@ -32,7 +32,7 @@ export const getHost = state => getStateBase(state).host;
 export const setName = name => ({ type: PLANNING_POKER_SET_NAME, payload: name });
 export const setSessionId = sessionId => ({ type: PLANNING_POKER_SET_SESSION_ID, payload: sessionId });
 export const setStep = step => ({ type: PLANNING_POKER_CHANGE_STEP, payload: step });
-export const setHost = step => ({ type: PLANNING_POKER_SET_HOST, payload: host });
+export const setHost = host => ({ type: PLANNING_POKER_SET_HOST, payload: host });
 
 export const requestAvailableSessions = wsAware(() => ({ type: REQUEST_AVAILABLE_SESSIONS }));
 export const performLogin = wsAware((sessionId, name) => ({
@@ -45,16 +45,20 @@ export const performLogin = wsAware((sessionId, name) => ({
 export const vote = wsAware(vote => ({ type: VOTE, payload: vote}));
 
 export const initWebsocket = () => (dispatch, getState) => {
-    console.log('init Websocket');
     ws = new WebSocket('ws://' + getHost(getState()), 'native-poker');
     ws.onmessage = ({ data }) => {
         const action = JSON.parse(data);
-        console.log(action);
         dispatch(action);
     };
     ws.onopen = () => dispatch(setStep(STEPS.LOGIN));
     ws.onclose = () => dispatch(setStep(STEPS.DISCONNECTED));
     ws.onerror = () => dispatch(setStep(STEPS.DISCONNECTED));
+};
+
+export const closeWebsocket = () => (dispatch, getState) => {
+    if (ws) {
+        ws.close();
+    }
 };
 
 export const login = () => (dispatch, getState) => {
